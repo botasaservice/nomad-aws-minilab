@@ -44,7 +44,7 @@ variable "az_map" {
 
 	default = {
 		0 = "a"
-		1 = "b"
-		2 = "c"
+		1 = "c"
+		2 = "d"
 	}
 }
