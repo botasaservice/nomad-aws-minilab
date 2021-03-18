@@ -19,7 +19,7 @@ resource "aws_instance" "nomad-node" {
 # Sets up policy to allow for ecr reads.
 resource "aws_iam_role_policy" "staging-client-docker_ecr_policy" {
     name = "nomad-client-docker_ecr_policy"
-    role = "${module.staging_clients.iam_role_id}"
+    role = "module.staging_clients.iam_role_id"
     policy = <<EOF
 {
     "Version": "2012-10-17",
