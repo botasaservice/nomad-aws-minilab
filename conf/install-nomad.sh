@@ -75,6 +75,17 @@ if [ $retval -eq 1 ]; then
   nomad -autocomplete-install
 fi
 
+sudo cat >/opt/nomad/config/client.hcl << EOF
+client {
+  enabled = true
+  node_class = "${node_class}"
+  options {
+    "docker.auth.helper" = "ecr-login"
+  }
+}
+EOF
+
+
 # Install Ansible for config management
 sudo amazon-linux-extras install ansible2 -y
 
