@@ -37,17 +37,17 @@ sudo chmod a+w /etc/nomad.d
 # Nomad config file copy
 sudo mkdir -p /tmp/nomad
 sudo curl https://raw.githubusercontent.com/discoposse/nomad-aws-minilab/master/conf/nomad/server.hcl -o /tmp/nomad/server.hcl
-sudo cat >/tmp/nomad/server.hcl << EOF
-plugin "docker" {
-  config {
-    auth {
+#sudo cat >/tmp/nomad/server.hcl << EOF
+#plugin "docker" {
+#  config {
+#    auth {
       # Nomad will prepend "docker-credential-" to the helper value and call
       # that script name.
-      helper = "ecr-login"
-    }
-  }
-}
-EOF
+#      helper = "ecr-login"
+#    }
+#  }
+#}
+#EOF
 sudo cp /tmp/nomad/server.hcl /etc/nomad.d/server.hcl
 
 # Install Consul
