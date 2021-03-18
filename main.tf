@@ -16,4 +16,30 @@ resource "aws_instance" "nomad-node" {
         Name = "nomad-node-${count.index}"
     }
 }
+# Sets up policy to allow for ecr reads.
+resource "aws_iam_role_policy" "staging-client-docker_ecr_policy" {
+    name = "nomad-client-docker_ecr_policy"
+    role = "${module.staging_clients.iam_role_id}"
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+    {
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:DescribeImages",
+                "ecr:BatchGetImage"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
 
