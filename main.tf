@@ -16,17 +16,17 @@ resource "aws_instance" "nomad-node" {
         Name = "nomad-node-${count.index}"
     }
 }
-# Sets up policy to allow for ecr reads.
 resource "aws_iam_role_policy" "staging-client-docker_ecr_policy" {
-    name = "nomad-client-docker_ecr_policy"
-    role = "module.staging_clients.iam_role_id"
-    policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-    {
-            "Effect": "Allow",
-            "Action": [
+  name = "test_policy"
+  role = aws_iam_role.test_role.id
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
@@ -35,11 +35,32 @@ resource "aws_iam_role_policy" "staging-client-docker_ecr_policy" {
                 "ecr:ListImages",
                 "ecr:DescribeImages",
                 "ecr:BatchGetImage"
-            ],
-            "Resource": "*"
-        }
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
     ]
+  })
 }
-EOF
+
+resource "aws_iam_role" "test_role" {
+  name = "test_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+
 }
 
