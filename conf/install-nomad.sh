@@ -39,6 +39,10 @@ sudo mkdir -p /tmp/nomad
 sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/nomad/server.hcl -o /tmp/nomad/server.hcl
 sudo cp /tmp/nomad/server.hcl /etc/nomad.d/server.hcl
 
+# Nomad dokcer file copy docker-auth.json
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/nomad/docker-auth.json -o /tmp/nomad/docker-auth.json
+sudo cp /tmp/nomad/docker-auth.json /etc/docker-auth.json
+
 # Install Consul
 CONSUL_VERSION=1.9.4
 sudo curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip > consul.zip
