@@ -57,7 +57,7 @@ sudo chmod a+w /etc/consul.d
 
 # Consul config file copy
 sudo mkdir -p /tmp/consul
-sudo curl https://raw.githubusercontent.com/discoposse/nomad-aws-minilab/master/conf/consul/server.hcl -o /tmp/consul/server.hcl
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/consul/server.hcl -o /tmp/consul/server.hcl
 sudo cp /tmp/consul/server.hcl /etc/consul.d/server.hcl
 
 for bin in cfssl cfssl-certinfo cfssljson
