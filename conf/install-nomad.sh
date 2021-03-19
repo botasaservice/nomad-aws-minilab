@@ -132,3 +132,17 @@ host_volume "*" {
 }
 EOF
 
+sudo tee -a /usr/local/bin/docker-credential-ecr-login <<EOF
+#!/bin/bash
+
+PASSWORD='aws --region ap-northeast-1 ecr get-login-password'
+
+echo '{'
+echo '"Username": "AWS",'
+echo "\"Secret\": \"${PASSWORD}\""
+echo '}'
+
+EOF
+
+chmod +x /usr/local/bin/docker-credential-ecr-login
+
