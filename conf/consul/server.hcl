@@ -15,3 +15,9 @@ acl = {
   default_policy = "allow"
   enable_token_persistence = true
 }
+plugin "docker" {
+   auth {
+     config = "/etc/docker-auth.json"
+   }
+ }
+
