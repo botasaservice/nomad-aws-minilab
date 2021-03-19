@@ -19,7 +19,7 @@ sudo systemctl restart docker
 sudo yum install amazon-ecr-credential-helper
 
 # Install Nomad
-NOMAD_VERSION=1.0.1
+NOMAD_VERSION=1.0.4
 sudo curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o nomad.zip
 if [ ! -d nomad ]; then
   sudo unzip nomad.zip
@@ -36,22 +36,11 @@ sudo chmod a+w /etc/nomad.d
 
 # Nomad config file copy
 sudo mkdir -p /tmp/nomad
-sudo curl https://raw.githubusercontent.com/discoposse/nomad-aws-minilab/master/conf/nomad/server.hcl -o /tmp/nomad/server.hcl
-#sudo cat >/tmp/nomad/server.hcl << EOF
-#plugin "docker" {
-#  config {
-#    auth {
-      # Nomad will prepend "docker-credential-" to the helper value and call
-      # that script name.
-#      helper = "ecr-login"
-#    }
-#  }
-#}
-#EOF
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/nomad/server.hcl -o /tmp/nomad/server.hcl
 sudo cp /tmp/nomad/server.hcl /etc/nomad.d/server.hcl
 
 # Install Consul
-CONSUL_VERSION=1.8.5
+CONSUL_VERSION=1.9.4
 sudo curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip > consul.zip
 if [ ! -d consul ]; then
   sudo unzip consul.zip
