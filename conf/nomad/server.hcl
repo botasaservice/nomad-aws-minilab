@@ -37,7 +37,10 @@ acl {
 }
 
 plugin "docker" {
-   auth {
-     config = "/etc/docker-auth.json"
-   }
- }
+  config {
+    auth {
+      config = "/root/.docker/config.json"
+      # Nomad will prepend "docker-credential-" to the helper value and call
+      # that script name.
+      helper = "ecr-login"
+    }
