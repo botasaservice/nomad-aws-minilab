@@ -30,13 +30,8 @@ client {
   enabled           = true
   network_interface = "eth0"
   servers           = ["10.0.0.100", "10.0.1.100", "10.0.2.100"]
-}
-
-acl {
-  enabled = false
-}
-
-plugin "docker" {
+  
+  plugin "docker" {
   config {
     auth {
       config = "/root/.docker/config.json"
@@ -44,3 +39,10 @@ plugin "docker" {
       # that script name.
       helper = "ecr-login"
     }
+}
+
+acl {
+  enabled = false
+}
+
+
