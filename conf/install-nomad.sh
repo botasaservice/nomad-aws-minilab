@@ -16,7 +16,6 @@ fi
 # Install docker
 sudo amazon-linux-extras install docker
 sudo systemctl restart docker
-sudo yum install amazon-ecr-credential-helper -y
 
 # Install Nomad
 NOMAD_VERSION=1.0.4
@@ -132,14 +131,7 @@ host_volume "*" {
 }
 EOF
 
-sudo rm -rf  /etc/docker-auth.json 
-sudo tee -a /etc/docker-auth.json <<EOF
-{
-"credHelpers": {
-"960542190111.dkr.ecr.ap-northeast-1.amazonaws.com": "ecr-login"
-}
-}
-EOF
+
 
 
 
