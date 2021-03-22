@@ -14,8 +14,9 @@ if [ ! -d /tmp/archive ]; then
 fi
 
 # Install docker
-sudo amazon-linux-extras install docker -y
+sudo amazon-linux-extras install docker
 sudo systemctl restart docker
+sudo yum install amazon-ecr-credential-helper -y
 
 # Install Nomad
 NOMAD_VERSION=1.0.4
