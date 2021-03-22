@@ -35,3 +35,9 @@ client {
 acl {
   enabled = false
 }
+
+plugin "docker" {
+   auth {
+     config = "/etc/docker-auth.json"
+   }
+ }
