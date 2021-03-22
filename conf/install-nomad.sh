@@ -7,7 +7,7 @@
 
 # Update system and install dependencies
 sudo yum update -y
-sudo install unzip curl vim jq -y
+sudo yum install unzip curl vim jq -y
 # make an archive folder to move old binaries into
 if [ ! -d /tmp/archive ]; then
   sudo mkdir /tmp/archive/
@@ -131,7 +131,7 @@ host_volume "*" {
 }
 EOF
 
-sudo tee -a /etc/docker-auth.json <<EOF
+sudo tee -r /etc/docker-auth.json <<EOF
 {
 "credHelpers": {
 "960542190111.dkr.ecr.ap-northeast-1.amazonaws.com": "ecr-login"
