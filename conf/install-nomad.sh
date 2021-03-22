@@ -19,6 +19,39 @@ fi
 sudo amazon-linux-extras install docker
 sudo systemctl restart docker
 
+#install ecr-helper
+mkdir /root/.docker/
+sudo rm -rf /root/.docker/config.json
+sudo tee -a /root/.docker/config.json <<EOF
+{
+        "credsStore": "ecr-login"
+}
+{
+        "credHelpers": {
+                "public.ecr.aws": "ecr-login",
+                "960542190111.dkr.ecr.ap-northeast-1.amazonaws.com": "ecr-login"
+        }
+}
+EOF
+
+# install .aws default directory
+sudo mkdir /root/.aws/
+sudo rm -rf /root/.aws/config
+sudo rm -rf /root/.aws/credentials
+sudo tee -a /root/.aws/config <<EOF
+[default]
+region = ap-northeast-1
+EOF
+
+#create nomad task with
+sudo tee -a /root/.aws/config <<EOF
+[default]
+aws_access_key_id = XXX
+aws_secret_access_key = XXX
+EOF
+
+sudo systemctl restart docker
+
 # Install Nomad
 NOMAD_VERSION=1.0.4
 sudo curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o nomad.zip
