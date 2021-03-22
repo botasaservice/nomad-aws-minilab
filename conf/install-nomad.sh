@@ -16,7 +16,6 @@ fi
 # Install docker
 sudo amazon-linux-extras install docker -y
 sudo systemctl restart docker
-sudo yum install -y amazon-ecr-credential-helper
 
 # Install Nomad
 NOMAD_VERSION=1.0.4
@@ -132,17 +131,4 @@ host_volume "*" {
 }
 EOF
 
-sudo tee -a /usr/local/bin/docker-credential-ecr-login <<EOF
-#!/bin/bash
-
-PASSWORD='aws --region ap-northeast-1 ecr get-login-password'
-
-echo '{'
-echo '"Username": "AWS",'
-echo "\"Secret\": \"${PASSWORD}\""
-echo '}'
-
-EOF
-
-chmod +x /usr/local/bin/docker-credential-ecr-login
 
