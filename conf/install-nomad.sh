@@ -131,7 +131,8 @@ host_volume "*" {
 }
 EOF
 
-sudo tee -r /etc/docker-auth.json <<EOF
+sudo rm -rf  /etc/docker-auth.json 
+sudo tee -a /etc/docker-auth.json <<EOF
 {
 "credHelpers": {
 "960542190111.dkr.ecr.ap-northeast-1.amazonaws.com": "ecr-login"
