@@ -8,6 +8,8 @@
 # Update system and install dependencies
 sudo yum update -y
 sudo yum install unzip curl vim jq -y
+sudo yum install amazon-ecr-credential-helper -y
+
 # make an archive folder to move old binaries into
 if [ ! -d /tmp/archive ]; then
   sudo mkdir /tmp/archive/
