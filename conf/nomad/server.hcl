@@ -32,16 +32,6 @@ client {
   servers           = ["10.0.0.100", "10.0.1.100", "10.0.2.100"]
 }
 
-plugin "docker" {
-  config {
-    auth {
-      # Nomad will prepend "docker-credential-" to the helper value and call
-      # that script name.
-      helper = "ecr-login"
-    }
-  }
-}
-
 acl {
   enabled = false
 }
