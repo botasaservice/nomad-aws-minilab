@@ -6,6 +6,7 @@
 #  
 
 # Update system and install dependencies
+
 sudo yum update -y
 sudo yum install unzip curl vim jq -y
 sudo yum install amazon-ecr-credential-helper -y
