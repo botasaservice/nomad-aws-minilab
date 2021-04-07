@@ -16,6 +16,7 @@ resource "aws_route_table" "nomad-lab-public-crt" {
         gateway_id = aws_internet_gateway.nomad-lab-igw.id
     }
     
+   
     tags = {
     	Name = "nomad-lab"
     	Terraform = "true"
