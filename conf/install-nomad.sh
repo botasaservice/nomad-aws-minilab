@@ -1,33 +1,60 @@
 #!/bin/bash
-# Update the apt packages and get a couple of basic tools
-sudo apt-get update -y
-sudo apt-get install unzip curl vim jq -y
+# 
+# user-data script for deploying Nomad on Amazon Linux 2
+# 
+# Using the user-data / cloud init ensures we don't run twice
+#  
+
+# Update system and install dependencies
+
+sudo yum update -y
+sudo yum install unzip curl vim jq -y
+sudo yum install amazon-ecr-credential-helper -y
+
 # make an archive folder to move old binaries into
 if [ ! -d /tmp/archive ]; then
   sudo mkdir /tmp/archive/
 fi
 
-# Install Docker Community Edition
-echo "Docker Install Beginning..."
-sudo apt-get remove docker docker-engine docker.io
-sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg |  sudo apt-key add -
-sudo apt-key fingerprint 0EBFCD88
-sudo add-apt-repository \
-      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) \
-      stable"
-sudo apt-get update -y
-sudo apt-get install -y docker-ce
-sudo service docker restart
-# Configure Docker to be run as the vagrant user
-sudo usermod -aG docker vagrant
-sudo docker --version
+# Install docker
+sudo amazon-linux-extras install docker
+sudo systemctl restart docker
 
-echo "Nomad Install Beginning..."
-# For now we use a static version. Set to the latest tested version you want here.
-NOMAD_VERSION=0.12.7
-cd /tmp/
+#install ecr-helper
+mkdir /root/.docker/
+sudo rm -rf /root/.docker/config.json
+sudo tee -a /root/.docker/config.json <<EOF
+{
+        "credsStore": "ecr-login"
+}
+{
+        "credHelpers": {
+                "public.ecr.aws": "ecr-login",
+                "960542190111.dkr.ecr.ap-northeast-1.amazonaws.com": "ecr-login"
+        }
+}
+EOF
+
+# install .aws default directory
+sudo mkdir /root/.aws/
+sudo rm -rf /root/.aws/config
+sudo rm -rf /root/.aws/credentials
+sudo tee -a /root/.aws/config <<EOF
+[default]
+region = ap-northeast-1
+EOF
+
+#create nomad task with
+sudo tee -a /root/.aws/config <<EOF
+[default]
+aws_access_key_id = XXX
+aws_secret_access_key = XXX
+EOF
+
+sudo systemctl restart docker
+
+# Install Nomad
+NOMAD_VERSION=1.0.4
 sudo curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o nomad.zip
 if [ ! -d nomad ]; then
   sudo unzip nomad.zip
@@ -41,16 +68,21 @@ fi
 sudo mv /tmp/nomad /tmp/archive/nomad
 sudo mkdir -p /etc/nomad.d
 sudo chmod a+w /etc/nomad.d
-sudo cp /vagrant/nomad-config/nomad-server-east.hcl /etc/nomad.d/
 
-echo "Consul Install Beginning..."
-# Uncommend the first and comment the second line to get the latest edition
-# Otherwise use the static number
-#CONSUL_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/consul | jq -r ".current_version")
-CONSUL_VERSION=1.8.5
+# Nomad config file copy
+sudo mkdir -p /tmp/nomad
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/nomad/server.hcl -o /tmp/nomad/server.hcl
+sudo cp /tmp/nomad/server.hcl /etc/nomad.d/server.hcl
+
+# Nomad dokcer file copy docker-auth.json
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/nomad/docker-auth.json -o /tmp/nomad/docker-auth.json
+sudo cp /tmp/nomad/docker-auth.json /etc/docker-auth.json
+
+# Install Consul
+CONSUL_VERSION=1.9.4
 sudo curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip > consul.zip
 if [ ! -d consul ]; then
-  sudo unzip /tmp/consul.zip
+  sudo unzip consul.zip
 fi
 if [ ! -f /usr/bin/consul ]; then
   sudo install consul /usr/bin/consul
@@ -61,7 +93,11 @@ fi
 sudo mv /tmp/consul /tmp/archive/consul
 sudo mkdir -p /etc/consul.d
 sudo chmod a+w /etc/consul.d
-sudo cp /vagrant/consul-config/consul-server-east.hcl /etc/consul.d/
+
+# Consul config file copy
+sudo mkdir -p /tmp/consul
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/consul/server.hcl -o /tmp/consul/server.hcl
+sudo cp /tmp/consul/server.hcl /etc/consul.d/server.hcl
 
 for bin in cfssl cfssl-certinfo cfssljson
 do
@@ -78,3 +114,50 @@ retval=$?
 if [ $retval -eq 1 ]; then
   nomad -autocomplete-install
 fi
+
+
+
+# Install Ansible for config management
+sudo amazon-linux-extras install ansible2 -y
+
+# Form Consul Cluster
+ps -C consul
+retval=$?
+if [ $retval -eq 0 ]; then
+  sudo killall consul
+fi
+sudo nohup consul agent --config-file /etc/consul.d/server.hcl &>$HOME/consul.log &
+
+# Form Nomad Cluster
+ps -C nomad
+retval=$?
+if [ $retval -eq 0 ]; then
+  sudo killall nomad
+fi
+sudo nohup nomad agent -config /etc/nomad.d/server.hcl &>$HOME/nomad.log &
+
+# Bootstrap Nomad and Consul ACL environment
+
+# Write anonymous policy file 
+
+sudo tee -a /tmp/anonymous.policy <<EOF
+namespace "*" {
+  policy       = "write"
+  capabilities = ["alloc-node-exec"]
+}
+agent {
+  policy = "write"
+}
+operator {
+  policy = "write"
+}
+quota {
+  policy = "write"
+}
+node {
+  policy = "write"
+}
+host_volume "*" {
+  policy = "write"
+}
+EOF
