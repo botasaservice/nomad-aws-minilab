@@ -113,6 +113,10 @@ sudo mkdir -p /tmp/consul
 sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/consul/server.hcl -o /tmp/consul/server.hcl
 sudo cp /tmp/consul/server.hcl /etc/consul.d/server.hcl
 
+#copy installer local (in case of errors)
+sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/master/conf/install-nomad.sh -o /tmp/install.sh
+sudo chmod +x /tmp/install.sh
+
 for bin in cfssl cfssl-certinfo cfssljson
 do
   echo "$bin Install Beginning..."
