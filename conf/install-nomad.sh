@@ -24,7 +24,7 @@ sudo usermod -a -G docker ec2-user
 sudo chkconfig docker on
 
 #install ecr-helper
-mkdir /root/.docker/
+sudo mkdir /root/.docker/
 sudo rm -rf /root/.docker/config.json
 sudo tee -a /root/.docker/config.json <<EOF
 {
@@ -92,6 +92,7 @@ sudo cp /tmp/nomad/docker-auth.json /etc/docker-auth.json
 # Install Consul
 #CONSUL_VERSION=1.9.4
 CONSUL_VERSION=1.10.2
+sudo mkdir -p /tmp/consul
 
 sudo curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip > consul.zip
 if [ ! -d consul ]; then
@@ -116,19 +117,17 @@ for bin in cfssl cfssl-certinfo cfssljson
 do
   echo "$bin Install Beginning..."
   if [ ! -f /tmp/${bin} ]; then
-    curl -sSL https://pkg.cfssl.org/R1.2/${bin}_linux-amd64 > /tmp/${bin}
+   sudo curl -sSL https://pkg.cfssl.org/R1.2/${bin}_linux-amd64 > /tmp/${bin}
   fi
   if [ ! -f /usr/local/bin/${bin} ]; then
     sudo install /tmp/${bin} /usr/local/bin/${bin}
   fi
 done
-cat /root/.bashrc | grep  "complete -C /usr/bin/nomad nomad"
+sudo cat /root/.bashrc | grep  "complete -C /usr/bin/nomad nomad"
 retval=$?
 if [ $retval -eq 1 ]; then
-  nomad -autocomplete-install
+ sudo nomad -autocomplete-install
 fi
-
-
 
 # Install Ansible for config management
 sudo amazon-linux-extras install ansible2 -y
@@ -148,8 +147,6 @@ if [ $retval -eq 0 ]; then
   sudo killall nomad
 fi
 sudo nohup nomad agent -config /etc/nomad.d/server.hcl &>$HOME/nomad.log &
-
-# Bootstrap Nomad and Consul ACL environment
 
 # Write anonymous policy file 
 
