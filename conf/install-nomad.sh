@@ -54,10 +54,18 @@ aws_access_key_id = XXX
 aws_secret_access_key = XXX
 EOF
 
+#create system prune
+sudo tee -a /root/.aws/crontab <<EOF
+0 3 * * * /usr/bin/docker system prune -f
+EOF
+
+sudo crontab /root/.aws/crontab
+
 sudo systemctl restart docker
 
 # Install Nomad
-NOMAD_VERSION=1.0.4
+#NOMAD_VERSION=1.0.4
+NOMAD_VERSION=1.1.4
 sudo curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o nomad.zip
 if [ ! -d nomad ]; then
   sudo unzip nomad.zip
@@ -82,7 +90,9 @@ sudo curl https://raw.githubusercontent.com/botasaservice/nomad-aws-minilab/mast
 sudo cp /tmp/nomad/docker-auth.json /etc/docker-auth.json
 
 # Install Consul
-CONSUL_VERSION=1.9.4
+#CONSUL_VERSION=1.9.4
+CONSUL_VERSION=1.10.2
+
 sudo curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip > consul.zip
 if [ ! -d consul ]; then
   sudo unzip consul.zip
