@@ -17,8 +17,11 @@ if [ ! -d /tmp/archive ]; then
 fi
 
 # Install docker
+sudo yum install -y git
 sudo amazon-linux-extras install docker
-sudo systemctl restart docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+sudo chkconfig docker on
 
 #install ecr-helper
 mkdir /root/.docker/
