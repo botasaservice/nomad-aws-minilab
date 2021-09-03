@@ -176,3 +176,7 @@ host_volume "*" {
 EOF
 
 #new versions
+
+sudo usermod -a -G docker ec2-user
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
